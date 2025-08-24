@@ -6,9 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "nodemon src/index.ts",
-    "seed": "ts-node ./seed.ts",
-    "render": "pnpm i && pnpm run build"
+    "dev": "nodemon src/index.ts"
   },
   "keywords": [],
   "author": "",
