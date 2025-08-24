@@ -13,6 +13,10 @@ This project serves as an API layer to interact with the MCP (Model Context Prot
 - `src/routers/`: API route definitions for different modules.
 - `src/utils/`: Utility functions and type definitions.
 
+## MCP Integration
+
+This project integrates with the Model Context Protocol (MCP) to provide a flexible and extensible way to interact with external systems and services. The `src/routers/mcp.ts` file defines the API endpoints for interacting with the MCP server, allowing for dynamic tool execution and resource access.
+
 ## Getting Started
 
 ### Prerequisites
@@ -52,11 +56,6 @@ This project serves as an API layer to interact with the MCP (Model Context Prot
 
     ```bash
     pnpm drizzle-kit migrate
-    ```
-
-2.  **Seed the database (optional):**
-    ```bash
-    pnpm ts-node seed.ts
     ```
 
 ### Running the Application
