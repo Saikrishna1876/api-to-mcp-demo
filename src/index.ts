@@ -5,6 +5,7 @@ import path from "node:path";
 import fs from "node:fs";
 import customerRouter from "./routers/customer";
 import attachmentRouter from "./routers/attachment";
+import mcpRouter from "./routers/mcp";
 import swaggerUi from "swagger-ui-express";
 import { openApiDoc } from "./swagger";
 
@@ -30,15 +31,13 @@ app.use("/uploads", express.static(uploadDir));
 app.use(express.json());
 
 // Define your routes
-app.get("/info", (req, res) => {
-  res.status(200).send("Status: OK");
-});
 app.get("/health", (req, res) => {
   res.status(200).send("OK");
 });
 
 app.use("/customer/api/customers", customerRouter);
 app.use("/attachment/api/attachments", attachmentRouter);
+app.use("/mcp", mcpRouter);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiDoc));
 
