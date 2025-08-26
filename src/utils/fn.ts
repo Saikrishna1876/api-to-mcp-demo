@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { db } from "../db";
 import { parse } from "json2csv";
-import { managePermission, parseTypes } from "./helper";
-import { asc, count, desc, eq, sql } from "drizzle-orm";
+import { parseTypes } from "./helper";
+import { and, asc, count, desc, eq, ne, sql } from "drizzle-orm";
 import * as schemas from "../db/schema";
 import { PgColumn } from "drizzle-orm/pg-core";
 import { addPath, responseCodeObjects } from "../swagger";
@@ -33,7 +33,6 @@ export const createMultiple = ({
   uniqueFieldsForAPI,
   databaseFieldsForAPI,
   regexValidatedFields,
-  usePermission,
 }: ModuleParams) => {
   addPath(`/${moduleNameSingular}/api/${moduleNamePlural}/multiple`, "post", {
     summary: `Create multiple ${moduleNameSingular} records`,
@@ -201,21 +200,17 @@ export const createMultiple = ({
   };
 };
 
-export const createOne = (
-  {
-    module,
-    moduleNameSingular,
-    moduleNamePlural,
-    databaseFieldsForAPI,
-    requiredFieldsForAPI,
-    uniqueFieldsForAPI,
-    regexValidatedFields,
-    generatedFieldsForAPI,
-    sampleData,
-    usePermission,
-  }: ModuleParams,
-  added_by: boolean = true
-) => {
+export const createOne = ({
+  module,
+  moduleNameSingular,
+  moduleNamePlural,
+  databaseFieldsForAPI,
+  requiredFieldsForAPI,
+  uniqueFieldsForAPI,
+  regexValidatedFields,
+  generatedFieldsForAPI,
+  sampleData,
+}: ModuleParams) => {
   // Add this block
   addPath(`/${moduleNameSingular}/api/${moduleNamePlural}`, "post", {
     summary: `Create a single ${moduleNameSingular} record`,
@@ -334,7 +329,6 @@ export const exportModule = ({
   moduleNameSingular,
   moduleNamePlural,
   allFieldsForAPI,
-  usePermission,
 }: ModuleParams) => {
   addPath(`/${moduleNameSingular}/api/${moduleNamePlural}/export`, "get", {
     summary: `Export ${moduleNameSingular} records`,
@@ -431,7 +425,6 @@ export const getAll = ({
   moduleNamePlural,
   moduleNameSingular,
   orderBy,
-  usePermission,
 }: ModuleParams) => {
   // Add this block
   addPath(`/${moduleNameSingular}/api/${moduleNamePlural}`, "get", {
@@ -483,7 +476,6 @@ export const getAllTran = ({
   dependentField,
   orderBy,
   moduleMasterTableName,
-  usePermission,
 }: ModuleParams) => {
   // Add this block
   addPath(`/${moduleNameSingular}/api/${moduleNamePlural}/tran`, "get", {
@@ -530,7 +522,6 @@ export const getOne = ({
   module,
   moduleNamePlural,
   moduleNameSingular,
-  usePermission,
 }: ModuleParams) => {
   addPath(`/${moduleNameSingular}/api/${moduleNamePlural}/{id}`, "get", {
     summary: `Get a single ${moduleNameSingular} record by ID`,
@@ -573,7 +564,7 @@ export const getOne = ({
         .where(eq(module.id, Number(row_id)))
         .limit(1);
       const result = await exe_query;
-      if (!result) {
+      if (result.length == 0) {
         res.status(404).json({ error: `${moduleNameSingular} not found` });
         return;
       }
@@ -596,7 +587,6 @@ export const updateOne = ({
   generatedFieldsForAPI,
   sampleData,
   arrayFields,
-  usePermission,
 }: ModuleParams) => {
   addPath(`/${moduleNameSingular}/api/${moduleNamePlural}/{id}`, "put", {
     summary: `Update a single ${moduleNameSingular} record by ID`,
@@ -681,9 +671,12 @@ export const updateOne = ({
             .select({ count: count() })
             .from(module)
             .where(
-              eq(
-                module[field as keyof Module[keyof Module]],
-                data_to_update[field]
+              and(
+                eq(
+                  module[field as keyof Module[keyof Module]],
+                  data_to_update[field]
+                ),
+                ne(module.id, Number(row_id))
               )
             );
           if (existing_row[0].count > 0) {
@@ -751,7 +744,6 @@ export const softDelete = ({
   moduleNamePlural,
   moduleNameSingular,
   preDeleteValidation,
-  usePermission,
 }: ModuleParams) => {
   addPath(`/${moduleNameSingular}/api/${moduleNamePlural}/{id}`, "delete", {
     summary: `Soft delete a single ${moduleNameSingular} record by ID`,
@@ -900,7 +892,7 @@ export const registerFiles = ({
 
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const files = req.files as Express.MulterS3.File[];
+      const files = req.files as Express.Multer.File[];
       const row_id = Number(req.params.row_id);
       const module_name = req.params.module_name;
 
@@ -926,7 +918,7 @@ export const registerFiles = ({
 
       res.status(200).json({
         message: `${files.length} file(s) registered successfully.`,
-        files: files.map((f) => f.location),
+        files: files.map((f) => f.filename),
       });
       return;
     } catch (error: any) {

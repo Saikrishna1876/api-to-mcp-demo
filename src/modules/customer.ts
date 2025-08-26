@@ -1,41 +1,9 @@
-import { Request, Response, NextFunction } from "express";
-import { db } from "../db";
-import { sql } from "drizzle-orm";
 import { getSchema } from "../utils/fn";
-import { fetchUserIdFromHeader } from "../utils/helper";
 import { customer as customerTable } from "../db/schema";
 
 export const moduleNameSingular = "customer";
 export const moduleNamePlural = "customers";
 export const module = customerTable;
-
-export const userAuthMiddleware = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const userId = await fetchUserIdFromHeader(req, res);
-  if (userId == undefined) {
-    console.log("Invalid user id");
-    return;
-  }
-
-  const user = await db.execute(
-    sql`SELECT * FROM users WHERE id = ${userId} LIMIT 1;`
-  );
-  if (user.rows.length === 0) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
-  }
-
-  if (req.path == "/" && req.method.toLowerCase() == "get") {
-    next();
-    return;
-  }
-
-  if (req.body) req.body.user = user.rows[0];
-  next();
-};
 
 export const sampleData = [
   { fieldName: "name", type: "" },
@@ -98,6 +66,7 @@ const customer = {
     field: "id",
     type: 1 as 0 | 1,
   },
+  hasUpdateFields: false,
 };
 
 export default customer;

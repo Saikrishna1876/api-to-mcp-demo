@@ -5,10 +5,8 @@ import path from "node:path";
 import fs from "node:fs";
 import customerRouter from "./routers/customer";
 import attachmentRouter from "./routers/attachment";
-import mcpRouter from "./routers/mcp";
 import swaggerUi from "swagger-ui-express";
 import { openApiDoc } from "./swagger";
-
 config({ path: ".env" });
 
 const app: express.Express = express();
@@ -37,8 +35,8 @@ app.get("/health", (req, res) => {
 
 app.use("/customer/api/customers", customerRouter);
 app.use("/attachment/api/attachments", attachmentRouter);
-app.use("/mcp", mcpRouter);
 
+console.log(openApiDoc);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiDoc));
 
 // Error middleware

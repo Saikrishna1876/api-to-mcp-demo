@@ -1,5 +1,12 @@
 import { Router } from "express";
-import { createOne, createMultiple, softDelete, getAll } from "../utils/fn";
+import {
+  createOne,
+  createMultiple,
+  softDelete,
+  getAll,
+  updateOne,
+  getOne,
+} from "../utils/fn";
 import customer, {
   customerSchema,
   moduleNamePlural,
@@ -12,9 +19,13 @@ addSchema(moduleNamePlural, customerSchema);
 
 customerRouter.post("/multiple", createMultiple(customer));
 
+customerRouter.post("/", createOne(customer));
+
 customerRouter.get("/", getAll(customer));
 
-customerRouter.post("/", createOne(customer));
+customerRouter.get("/:id", getOne(customer));
+
+customerRouter.put("/:id", updateOne(customer));
 
 customerRouter.delete("/:id", softDelete(customer));
 

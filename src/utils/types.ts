@@ -44,32 +44,20 @@ export type ErrorObject = {
 
 export type ResponseObject = Partial<ModuleParams> & ErrorObject;
 
-export type Condition =
-  | {
-      type: "id_match";
-      table: string;
-      column: string;
-      value: string;
-    }
-  | {
-      type: "date_range";
-      table: string;
-      column: string;
-      start: string;
-      end: string;
-    }
-  | {
-      type: "date_range_column";
-      table: string;
-      date: string;
-      startColumn: string;
-      endColumn: string;
-    };
+export type Tool = {};
 
-export interface Join {
-  type: "INNER JOIN" | "LEFT JOIN" | "RIGHT JOIN" | "FULL OUTER JOIN";
-  fromTable: string;
-  fromColumn: string;
-  toTable: string;
-  toColumn: string;
+/*
+{
+  openapi: '3.0.1',
+  info: { title: 'api-to-mcp-demo', version: '1.0.0' },
+  paths: {
+    '/customer/api/customers/multiple': { post: [Object] },
+    '/customer/api/customers': { get: [Object], post: [Object] },
+    '/customer/api/customers/{id}': { get: [Object], put: [Object], delete: [Object] },
+    '/attachment/api/attachments/tran': { get: [Object] },
+    '/attachment/api/attachments/{id}': { put: [Object], delete: [Object] },
+    '/attachment/api/attachments/{row_id}/{module_name}': { post: [Object] }
+  },
+  components: { schemas: { customers: [Object], attachments: [Object] } }
 }
+*/

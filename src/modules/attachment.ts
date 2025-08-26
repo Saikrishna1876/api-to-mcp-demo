@@ -1,7 +1,4 @@
-import { Request, Response, NextFunction } from "express";
-import { query } from "../db";
 import { getSchema } from "../utils/fn";
-import { fetchUserIdFromHeader } from "../utils/helper";
 import { attachment as attachmentTable } from "../db/schema";
 import multer from "multer";
 import path from "node:path";
@@ -30,42 +27,6 @@ export const createUploadMiddleware = multer({
     fileSize: 10 * 1024 * 1024, // 10MB
   },
 });
-
-export const userAuthMiddleware = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const userId = await fetchUserIdFromHeader(req, res);
-  if (userId == undefined) {
-    console.log("Invalid user id");
-    return;
-  }
-
-  const user = await query("SELECT * FROM users WHERE id = $1 LIMIT 1;", [
-    userId,
-  ]);
-  if (user.rows.length === 0) {
-    res.status(401).json({ error: "Unauthorized" });
-    return;
-  }
-
-  if (req.path == "/" && req.method.toLowerCase() == "get") {
-    next();
-    return;
-  }
-
-  if (!req.body) {
-    req.body = {
-      user: {
-        id: user.rows[0].id,
-      },
-    };
-  } else {
-    req.body.user = user.rows[0];
-  }
-  next();
-};
 
 export const sampleData = [
   { fieldName: "rowId", type: 0 },
